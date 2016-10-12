@@ -1,0 +1,34 @@
+---
+- name: Run Setup
+  hosts: fedorabox
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Install Cockpit
+      dnf: name=cockpit state=latest
+
+    - name: Install Cockpit-Docker
+      dnf: name=cockpit-docker state=latest
+
+    - name: Install Nginx
+      dnf: name=nginx state=latest
+
+    - name: Enable Nginx
+      command: systemctl enable nginx
+
+    - name: Enable Docker
+      command: systemctl enable docker.service
+
+    - name: Start Docker
+      command: systemctl start docker
+
+    - name: Enable Cockpit
+      command: systemctl enable --now cockpit.socket
+
+    - name: Copy Nginx conf
+      copy: src=srv/plone.io.conf dest=/etc/nginx/conf.d/plone.io.conf owner=root group=root mode=0644
+
+    - name: Reload Nginx
+      service: name=nginx state=reloaded
+
+...
